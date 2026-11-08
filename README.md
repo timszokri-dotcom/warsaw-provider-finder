@@ -1,6 +1,6 @@
 # Warsaw Provider Finder — step 1
 
-**Business question:** Which mapped car-repair businesses in Warsaw could Dima
+**Business question:** Which mapped car-repair businesses in Warsaw could a car service startup
 investigate as potential service providers for his marketplace?
 
 This first step retrieves real OpenStreetMap data through the public Overpass
