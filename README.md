@@ -1,7 +1,46 @@
-# Warsaw Provider Finder — step 1
+# Warsaw Provider Finder
 
-**Business question:** Which mapped car-repair businesses in Warsaw could a car service startup
-investigate as potential service providers for his marketplace?
+**Business question:** Which mapped car-repair businesses in Warsaw could a car-service startup
+investigate as potential service providers for a car-service marketplace?
+
+## Geoapify REST API — beginner exercise
+
+`fetch_geoapify.py` makes a GET request for up to 20 car-repair places within
+10 km of a selected point in Warsaw. It reads an API key from the environment,
+checks HTTP status and response structure, prints business names, and saves
+`data/geoapify_response.json`. The circle is not Warsaw's administrative boundary,
+and this one-page sample is not an exhaustive list. No scheduling is implemented.
+
+Create a free Geoapify project and key, then run on macOS/Linux:
+
+```sh
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+# Prompt for the key without displaying it or storing it in shell history.
+printf 'Geoapify API key: '
+read -r -s GEOAPIFY_API_KEY
+export GEOAPIFY_API_KEY
+printf '\\n'
+python fetch_geoapify.py
+```
+
+Run the offline checks (no API credits used):
+
+```sh
+python -m unittest test_geoapify -v
+```
+
+Never commit keys. `.env` files and generated data are ignored; the script does
+not automatically load `.env` files. Replace keys that have been disclosed.
+Keep usage within your free-plan allowance; a request can consume multiple credits.
+Observe Geoapify and underlying data-source attribution requirements when sharing
+results. This connector demonstrates REST API extraction, not advertising API access.
+
+- [Geoapify Places documentation](https://apidocs.geoapify.com/docs/places/)
+- [Plans and attribution requirements](https://www.geoapify.com/pricing/)
+
+## Original Overpass extractor
 
 This first step retrieves real OpenStreetMap data through the public Overpass
 HTTP API, validates the response, and exports a CSV. Python 3.9+; no packages,
