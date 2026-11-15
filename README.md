@@ -146,3 +146,17 @@ Use the returned `next_offset` for the next page. A null value means there
 are no more records in the current snapshot. Use a returned `id` with
 `GET /workshops/{workshop_id}` to retrieve one workshop. Each record includes
 its original GeoJSON feature.
+
+### Weekly refresh
+
+The local Codex automation is scheduled for Mondays at 9 a.m. Pacific.
+It runs the Geoapify fetcher with a two-page cap and requires
+`GEOAPIFY_API_KEY` in its runtime environment. A failed fetch leaves the
+previous GeoJSON snapshot in place.
+
+After a successful refresh, run the SQLite import to make the new snapshot
+available through FastAPI:
+
+```bash
+.venv/bin/python workshop_store.py
+```
