@@ -5,7 +5,7 @@ investigate as potential service providers for a car-service marketplace?
 
 ## Geoapify REST API — beginner exercise
 
-`fetch_geoapify.py` makes a GET request for up to 20 car-repair places within
+`fetch_geoapify.py` fetches up to two pages of 20 car-repair places each within
 10 km of a selected point in Warsaw. It reads an API key from the environment,
 checks HTTP status and response structure, prints business names, and saves
 `data/geoapify_response.json`. The circle is not Warsaw's administrative boundary,
@@ -22,8 +22,12 @@ printf 'Geoapify API key: '
 read -r -s GEOAPIFY_API_KEY
 export GEOAPIFY_API_KEY
 printf '\\n'
-python fetch_geoapify.py
+python fetch_geoapify.py --max-pages 2
 ```
+
+The script requests offsets 0 and 20, stops on a short page or at the
+configured page cap, and combines the results into one GeoJSON file.
+It keeps the first occurrence of each Geoapify place ID.
 
 Run the offline checks (no API credits used):
 
@@ -114,3 +118,31 @@ a derived database. CSV contact fields are source data, not an outreach instruct
 - https://wiki.openstreetmap.org/wiki/Tag:shop=car_repair
 
 The code and README are prepared for GitHub; nothing is published automatically.
+
+## Local workshop REST API
+
+The data flows from Geoapify to `data/geoapify_response.json`, then into
+`data/workshops.sqlite3`, which FastAPI reads. From this project directory:
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python workshop_store.py
+.venv/bin/python -m uvicorn workshop_api:app --host 127.0.0.1 --port 8000
+```
+
+The import uses the saved snapshot and needs no Geoapify key. After a
+successful fetch, rerun `workshop_store.py` to replace the imported snapshot
+in a single transaction. The running API will serve the new data on its
+next request.
+
+Open [the interactive API docs](http://127.0.0.1:8000/docs) or try:
+
+```bash
+curl 'http://127.0.0.1:8000/workshops?limit=5&offset=0'
+```
+
+Use the returned `next_offset` for the next page. A null value means there
+are no more records in the current snapshot. Use a returned `id` with
+`GET /workshops/{workshop_id}` to retrieve one workshop. Each record includes
+its original GeoJSON feature.
